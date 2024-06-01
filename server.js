@@ -1,8 +1,11 @@
 const express = require('express'); // Correct the spelling
 const app = express(); // Correct the spelling
-
 const con = require("./database/connectDatabase");
 const usersRoute = require('./router/users/usersRouter');
+
+// Middleware to parse JSON request bodies
+app.use(express.json());
+
 
 app.use('/api/users', usersRoute);
 
