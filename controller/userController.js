@@ -1,3 +1,4 @@
+const { status } = require('express/lib/response');
 const db = require('../database/connectDatabase');
 const bcrypt = require('bcrypt');  //for hash password
 
@@ -11,6 +12,7 @@ const GetuserAll = async (req, res) => {
                 success: false,
                 message: "NO DATA"
             });
+            
         }
 
         res.status(200).send({
@@ -28,18 +30,47 @@ const GetuserAll = async (req, res) => {
     }
 };
 
+const GetUserById = async (req, res) => {
+    const user_id = req.params.user_id;
+
+    try {
+        const query = 'SELECT * FROM final_project.users where users_id = ?';
+        const [rows] = await db.query(query, [user_id]);
+
+        if (!Array.isArray(rows) || rows.length === 0) {
+            return res.status(404).send({
+                success: false,
+                message: "NO DATA"
+            });
+        }
+
+        res.status(200).send({
+            success: true,
+            message: "ALL Lands By User_Id",
+            data: rows
+        });
+
+    } catch (e) {
+        console.error(e);
+        res.status(500).send({
+            success: false,
+            message: "ERROR GET Lands",
+            error: e.message
+        });
+    }
+};
 //Register Users
 const register_users = async (req, res) => {
     const {
         users_username,
         users_password,
         users_phone,
+        users_type,
         users_image,
-        users_address,
     } = req.body;
 
     // Validate the required fields
-    if (!users_username || !users_password || !users_image || !users_address || !users_phone) {
+    if (!users_username || !users_password || !users_image || !users_phone || !users_type) {
         return res.json({status: 'error' , message: 'Data not full' });
     }
 
@@ -48,28 +79,27 @@ const register_users = async (req, res) => {
 
     const query = `
         INSERT INTO final_project.users
-        (users_username, users_password, users_phone, users_type, users_image, users_address)
-        VALUES (?, ?, ?, ?, ?, ?)
+        (users_username, users_password, users_phone, users_type, users_image)
+        VALUES (?, ?, ?, ?, ?)
     `;
 
     const [result] = await db.query(query, [
         users_username,
         hashedPassword,
         users_phone,
-        0,
+        users_type,
         users_image,
-        users_address,
     ]);
 
 
-    res.json({status: 'ok',
+    res.status(200).send({
+        status: 'ok',
         message: 'Register success',
         data: {
             users_id: result.insertId,
             users_username,
             users_phone, 
             users_image,
-            users_address
     }});
 
     // res.status(201).send({
@@ -88,6 +118,7 @@ const register_users = async (req, res) => {
 
 //LoginUsers
 const LoginUsers = async (req, res) => {
+    
     const {
         users_username,
         users_password
@@ -95,9 +126,9 @@ const LoginUsers = async (req, res) => {
 
     //for check is it undifind
     if(!users_username || !users_password){
-        return res.json({
-            status: 'ok',
-            message: "Missing required fields"
+        return res.status(404).send({
+            status: 'FAIL',
+            message : 'User not found',
         });
     }
 
@@ -106,8 +137,8 @@ const LoginUsers = async (req, res) => {
     const [rows] = await db.query(query, [users_username]);
 
     if (rows.length == 0) {
-        return res.json({
-            status: 'ok ',
+        return res.status(404).send({
+            status: 'FAIL',
             message : 'User not found',
         });
     }
@@ -117,14 +148,14 @@ const LoginUsers = async (req, res) => {
     const isPasswordValid = await bcrypt.compare(users_password, user.users_password);
 
     if (!isPasswordValid) {
-        return res.json({
-            status: 'ok',
+        return res.status(401).send({
+            status: 'FAIL',
             message: 'password is incorrect'
         });
     }
 
-    res.json({
-        status: 'ok',
+    res.status(200).send({
+        status: 'OK',
         message: "Login successful",
         data: {
             users_id: user.users_id,
@@ -136,4 +167,31 @@ const LoginUsers = async (req, res) => {
     });
 };
 
-module.exports = { GetuserAll, register_users, LoginUsers };
+const updateProfile = async (req, res) => {
+    const user_id = req.params.user_id;
+    const {
+      users_password,
+      users_phone,
+      users_image
+    } = req.body; // Corrected to req.body
+  
+    const query = 'UPDATE final_project.users SET users_password = ?, users_phone = ? , users_image = ? WHERE users_id = ?';
+    
+    try {
+      const hashedPassword = await bcrypt.hash(users_password, 10);
+      const [result] = await db.query(query, [hashedPassword, users_phone , users_image, user_id]);
+      
+      res.status(200).send({
+        status: 'OK',
+        message: 'Update Success'
+      });
+    } catch (error) {
+      res.status(500).send({
+        status: 'Error',
+        message: 'An error occurred while updating the profile',
+        error: error.message
+      });
+    }
+  };
+
+module.exports = { GetuserAll, register_users, LoginUsers,GetUserById , updateProfile};
