@@ -2,12 +2,16 @@ const express = require('express'); // Correct the spelling
 const app = express(); // Correct the spelling
 const con = require("./database/connectDatabase");
 const usersRoute = require('./router/users/usersRouter');
+const ownersRoute = require('./router/owners/ownersRouter')
+const landsRoute = require('./router/lands/landsRouter')
 
 // Middleware to parse JSON request bodies
 app.use(express.json());
 
 
 app.use('/api/users', usersRoute);
+app.use('/api/owners', ownersRoute);
+app.use('/api/lands', landsRoute);
 
 app.get('/', function(req, res) {
     res.send("HELLO WORLD"); // Correct spelling from "HELLO WORD" to "HELLO WORLD"
