@@ -1,20 +1,22 @@
-const express = require('express'); // Correct the spelling
-const app = express(); // Correct the spelling
+const express = require('express'); 
+const app = express(); 
 const con = require("./database/connectDatabase");
 const usersRoute = require('./router/users/usersRouter');
 const ownersRoute = require('./router/owners/ownersRouter')
 const landsRoute = require('./router/lands/landsRouter')
+const landRouter = require('./router/lands/landsRouter');
+const ordersRouter = require('./router/orders/odersRoute');
 
-// Middleware to parse JSON request bodies
 app.use(express.json());
-
 
 app.use('/api/users', usersRoute);
 app.use('/api/owners', ownersRoute);
 app.use('/api/lands', landsRoute);
+app.use('/api/lands', landRouter);
+app.use('/api/orders',ordersRouter)
 
 app.get('/', function(req, res) {
-    res.send("HELLO WORLD"); // Correct spelling from "HELLO WORD" to "HELLO WORLD"
+    res.send("HELLO WORLD");
 });
 
 app.listen(5000, () => {
