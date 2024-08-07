@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
-const { GetLandAll } = require('../../controller/landController');
-const { GetLandsByUserid } = require('../../controller/landController');
-const { Addnewland } = require('../../controller/landController')
+const { GetLandAll } = require('../../controller/landCOntroller');
+const { GetLandsByUserid } = require('../../controller/landCOntroller');
+const { Addnewland } = require('../../controller/landCOntroller')
 
 
 router.get('/GetLandAll',GetLandAll);
