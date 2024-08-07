@@ -70,37 +70,53 @@ const register_users = async (req, res) => {
     } = req.body;
 
     // Validate the required fields
-    if (!users_username || !users_password || !users_image || !users_phone || !users_type) {
-        return res.json({status: 'error' , message: 'Data not full' });
+    let missingFields = [];
+    if (!users_username) missingFields.push('users_username');
+    if (!users_password) missingFields.push('users_password');
+    if (!users_phone) missingFields.push('users_phone');
+    if (users_type === undefined) missingFields.push('users_type');
+    if (!users_image) missingFields.push('users_image');
+
+    if (missingFields.length > 0) {
+        return res.status(400).json({ 
+            status: 'error', 
+            message: `Missing required fields: ${missingFields.join(', ')}` 
+        });
     }
 
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(users_password, 10);
+    try {
+        // Hash the password
+        const hashedPassword = await bcrypt.hash(users_password, 10);
 
-    const query = `
-        INSERT INTO final_project.users
-        (users_username, users_password, users_phone, users_type, users_image)
-        VALUES (?, ?, ?, ?, ?)
-    `;
+        const query = `
+            INSERT INTO final_project.users
+            (users_username, users_password, users_phone, users_type, users_image)
+            VALUES (?, ?, ?, ?, ?)
+        `;
 
-    const [result] = await db.query(query, [
-        users_username,
-        hashedPassword,
-        users_phone,
-        users_type,
-        users_image,
-    ]);
-
-
-    res.status(200).send({
-        status: 'ok',
-        message: 'Register success',
-        data: {
-            users_id: result.insertId,
+        const [result] = await db.query(query, [
             users_username,
-            users_phone, 
+            hashedPassword,
+            users_phone,
+            users_type,
             users_image,
-    }});
+        ]);
+
+        res.status(201).send({
+            status: 'ok',
+            message: 'Register success',
+            data: {
+                users_id: result.insertId,
+                users_username,
+                users_phone,
+                users_image,
+            }
+        });
+    } catch (error) {
+        console.error('Error during user registration:', error);
+        res.status(500).json({ status: 'error', message: 'Internal Server Error' });
+    }
+};
 
     // res.status(201).send({
     //     success: true,
@@ -113,8 +129,6 @@ const register_users = async (req, res) => {
     //         users_address
     //     }
     // });
-};
-
 
 //LoginUsers
 const LoginUsers = async (req, res) => {
@@ -162,7 +176,8 @@ const LoginUsers = async (req, res) => {
             users_username: user.users_username,
             users_phone: user.users_phone,
             users_image: user.users_image,
-            users_address: user.users_address
+            users_address: user.users_address,
+            users_type: user.users_type
         }
     });
 };
