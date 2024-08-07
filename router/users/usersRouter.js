@@ -13,7 +13,6 @@ const { updateProfile } = require('../../controller/userController');
 
 router.get('/Getusers', GetuserAll);
 router.get('/GetUserById/:user_id',GetUserById);
-
 router.post('/register_users', register_users);
 router.post('/LoginUsers', LoginUsers);
 router.post('/Reserve', Reserve);

@@ -92,4 +92,44 @@ const Addnewland = async (req,res) =>{
      })
 }
 
-module.exports = {GetLandAll,Addnewland,GetLandsByUserid};
+
+const GetLandStatus = async (req, res) =>{
+    const {
+        lands_id
+    } = req.body;
+
+    try {
+        const query = `
+            SELECT orders_id, orders_lands_id, orders_status
+            FROM  final_project.orders
+            WHERE orders_lands_id = ?
+            AND orders_status in (1,2,3,4)
+        `;
+        const [rows] = await db.query(query,[
+            lands_id
+        ]);
+
+        if(!Array.isArray(rows) || rows.length === 0){
+            return res.status(404).send({
+                success: false,
+                message: "!!!NO DATA => GetLandInOrder"
+            });
+        }
+
+        res.status(200).send({
+            success: true,
+            message: "DATA => GetLandInOrder",
+            data: rows
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({
+            success: false,
+            message:"ERROR GetLandInOrder",
+            error:error.message
+        })
+    }
+}
+
+module.exports = {GetLandAll,Addnewland,GetLandsByUserid,GetLandStatus};
