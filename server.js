@@ -2,13 +2,15 @@ const express = require('express');
 const app = express(); 
 const con = require("./database/connectDatabase");
 const usersRoute = require('./router/users/usersRouter');
-const landRouter = require('./router/lands/landsRouter');
+const ownersRoute = require('./router/owners/ownersRouter')
+const landsRoute = require('./router/lands/landsRouter')
 const ordersRouter = require('./router/orders/odersRoute');
 
 app.use(express.json());
 
 app.use('/api/users', usersRoute);
-app.use('/api/lands', landRouter);
+app.use('/api/owners', ownersRoute);
+app.use('/api/lands', landsRoute);
 app.use('/api/orders',ordersRouter)
 
 app.get('/', function(req, res) {
