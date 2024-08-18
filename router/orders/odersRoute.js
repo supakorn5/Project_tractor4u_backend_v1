@@ -7,6 +7,7 @@ const {GetOwnerID} = require('../../controller/ordersController');
 const {Resever} = require('../../controller/ordersController');
 const {GetDateStatus} = require('../../controller/ordersController');
 const {CloseJob} = require('../../controller/ordersController');
+const {UpdateDateStatus} = require('../../controller/ordersController');
 
 router.get('/GetJobByUserId/:userId', GetJobByUserId);
 router.get('/GetQueueByDate/:date/:userId', GetQueueByDate);
@@ -16,5 +17,6 @@ router.get('/GetDateStatus/:Owner_id',GetDateStatus);
 
 router.post('/Resever',Resever);
 router.post('/CloseJob',CloseJob);
+router.post('/UpdateDateStatus',UpdateDateStatus);
 
 module.exports = router;

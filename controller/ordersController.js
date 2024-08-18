@@ -47,14 +47,15 @@ const GetOwnerID = async (req, res) => {
     }
 };
 
-
 const GetJobByUserId = async (req, res) => {
     const userId = req.params.userId; 
     try {
         const query = `
-            SELECT DATE_FORMAT(orders_reserve_date, '%Y-%m-%d') as date
-            FROM final_project.orders
-            WHERE orders_owners_id = ?
+            SELECT users_username,DATE_FORMAT(orders_start_date, '%Y-%m-%d') as date
+FROM final_project.orders
+Inner Join final_project.users
+On users_id = orders_users_id
+WHERE orders_owners_id = ?
         `;
         const [rows] = await db.query(query, [userId]);
 
@@ -109,7 +110,7 @@ const GetQueueByDate = async (req, res) => {
             FROM final_project.orders
             inner join final_project.lands ON orders_lands_id = lands_id 
             inner join final_project.users ON orders_users_id = users_id
-            where orders_reserve_date = ?
+            where orders_start_date = ?
             and orders_owners_id = ?;
             
         `;
@@ -140,7 +141,7 @@ const GetQueueByDate = async (req, res) => {
     }
 };
 
-const GetDateStatus = async(req,res) =>{
+const GetDateStatus = async(req, res) => {
     const Owner_id = req.params.Owner_id;
     if (!Owner_id) {
         return res.status(400).send({
@@ -149,12 +150,13 @@ const GetDateStatus = async(req,res) =>{
         });
     }
 
-    const query = `select dateStatus_id, dateStatus_status, DATE_FORMAT(dateStatus_date, '%Y-%m-%d') as date
-                    from final_project.datestatus
-                    WHERE dateStatus_owners_id = ?;`
-    const [rows] = await db.query(query, [Owner_id]);
-    console.log(`Query result: ${JSON.stringify(rows)}`);
     try {
+        const query = `SELECT dateStatus_id, dateStatus_status, DATE_FORMAT(dateStatus_date, '%Y-%m-%d') as date
+                        FROM final_project.datestatus
+                        WHERE dateStatus_owners_id = ?;`;
+        const [rows] = await db.query(query, [Owner_id]);
+        console.log(`Query result: ${JSON.stringify(rows)}`);
+
         if (!Array.isArray(rows) || rows.length === 0) {
             return res.status(404).send({
                 success: false,
@@ -167,7 +169,6 @@ const GetDateStatus = async(req,res) =>{
             message: "All Queue By Date",
             data: rows
         });
-
     } catch (e) {
         console.error(e);
         res.status(500).send({
@@ -177,6 +178,7 @@ const GetDateStatus = async(req,res) =>{
         });
     }
 }
+
 
 const Resever = async (req, res) => {
     const {
@@ -188,6 +190,32 @@ const Resever = async (req, res) => {
     
     try {
       const [result] = await db.query(query, [orders_status , orders_id]);
+      
+      res.status(200).send({
+        status: 'OK',
+        message: 'Update Success'
+      });
+    } catch (error) {
+      res.status(500).send({
+        status: 'Error',
+        message: 'An error occurred while updating the Orders',
+        error: error.message
+      });
+    }
+  };
+
+  const UpdateDateStatus = async (req, res) => {
+    const {
+        dateStatus_id,
+        datestatus
+    } = req.body; // Corrected to req.body
+  
+    const query = `UPDATE final_project.datestatus
+                    set final_project.datestatus.dateStatus_status = ?
+                    WHERE final_project.datestatus.dateStatus_id = ?;`;
+    
+    try {
+      const [result] = await db.query(query, [datestatus,dateStatus_id]);
       
       res.status(200).send({
         status: 'OK',
@@ -227,5 +255,5 @@ const Resever = async (req, res) => {
     }
   };
 
-
-module.exports = { GetOwnerID , GetJobByUserId , GetQueueByDate , Resever , GetDateStatus , CloseJob};
+  //
+module.exports = { GetOwnerID , GetJobByUserId , GetQueueByDate , Resever , GetDateStatus , CloseJob , UpdateDateStatus };
