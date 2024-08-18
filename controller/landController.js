@@ -31,7 +31,17 @@ const GetLandsByUserid = async (req, res) => {
     const lands_user_id = req.params.lands_user_id;
 
     try {
-        const query = 'SELECT * FROM final_project.lands WHERE lands_users_id = ?';
+        const query = `
+        SELECT lands_id , lands_info , orders_status , date_format(orders_start_date,"%Y-%m-%d") as date , users_username
+        FROM final_project.lands 
+        INNER JOIN final_project.orders
+        ON lands_id = orders_lands_id
+        INNER JOIN final_project.owners
+        ON owners_id = orders_owners_id
+        INNER JOIN final_project.users
+        ON owners_users_id = users_id
+        WHERE lands_users_id = ?
+        order by lands_id;`;
         const [rows] = await db.query(query, [lands_user_id]);
 
         if (!Array.isArray(rows) || rows.length === 0) {
@@ -56,6 +66,39 @@ const GetLandsByUserid = async (req, res) => {
         });
     }
 };
+
+const GetLandNotReserve = async (req,res) => {
+    const lands_user_id = req.params.lands_user_id;
+    try {
+    const query = `
+                    SELECT lands_id , lands_info 
+                    FROM final_project.lands 
+                    left Join final_project.orders 
+                    On lands_id = orders_lands_id 
+                    where orders_lands_id IS NULL AND lands_users_id = ?`;
+                    const [rows] = await db.query(query, [lands_user_id]);
+
+                    if (!Array.isArray(rows) || rows.length === 0) {
+                        return res.status(404).send({
+                            success: false,
+                            message: "NO DATA"
+                        });
+                    }
+            
+                    res.status(200).send({
+                        success: true,
+                        message: "ALL Lands By User_Id",
+                        data: rows
+                    });
+            
+                } catch (e) {
+                    console.error(e);
+                    res.status(500).send({
+                        success: false,
+                        message: "ERROR GET Lands",
+                        error: e.message
+                    });
+                }}
 
 const Addnewland = async (req,res) =>{
     const {
@@ -132,4 +175,4 @@ const GetLandStatus = async (req, res) =>{
     }
 }
 
-module.exports = {GetLandAll,Addnewland,GetLandsByUserid,GetLandStatus};
+module.exports = {GetLandAll,Addnewland,GetLandsByUserid,GetLandStatus , GetLandNotReserve};
