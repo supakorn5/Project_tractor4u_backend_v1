@@ -52,10 +52,10 @@ const GetJobByUserId = async (req, res) => {
     try {
         const query = `
             SELECT users_username,DATE_FORMAT(orders_start_date, '%Y-%m-%d') as date
-FROM final_project.orders
-Inner Join final_project.users
-On users_id = orders_users_id
-WHERE orders_owners_id = ?
+                FROM final_project.orders
+                Inner Join final_project.users
+                On users_id = orders_users_id
+                WHERE orders_owners_id = ?
         `;
         const [rows] = await db.query(query, [userId]);
 
@@ -179,6 +179,98 @@ const GetDateStatus = async(req, res) => {
     }
 }
 
+const GetDateStatus_ID = async(req, res) => {
+    const dateParam = req.params.date;
+    const date = moment(dateParam, 'YYYY-MM-DD').format('YYYY-MM-DD');
+
+    // Validate the date format
+    if (!moment(date, 'YYYY-MM-DD', true).isValid()) {
+        return res.status(400).send({
+            success: false,
+            message: "Invalid date format"
+        });
+    }
+
+    // Validate orders_users_id parameter
+    const userId = req.params.userId;
+
+    try {
+        const query = `select dateStatus_id,DATE_FORMAT(dateStatus_date,'%Y-%m-%d') as date
+                        FROM final_project.owners
+                        INNER JOIN final_project.datestatus On  owners_id = dateStatus_owners_id
+                        where dateStatus_date = ?
+                        and dateStatus_owners_id = ?`;
+                        const [rows] = await db.query(query, [date, userId]);
+
+                        console.log(`Query result: ${JSON.stringify(rows)}`);
+                
+                        if (!Array.isArray(rows) || rows.length === 0) {
+                            return res.status(404).send({
+                                success: false,
+                                message: "No data found"
+                            });
+                        }
+                
+                        res.status(200).send({
+                            success: true,
+                            message: "All Queue By Date",
+                            data: rows
+                        });
+                
+                    } catch (e) {
+                        console.error(e);
+                        res.status(500).send({
+                            success: false,
+                            message: "Error getting queue",
+                            error: e.message
+                        });
+                    }
+}
+
+const GetUserID = async (req, res) => {
+    const userId = req.params.userId;
+
+    try {
+        // Define the query with proper table aliases
+        const query = `
+            select owners_users_id
+                from final_project.owners
+                where owners_id = ?
+        `;
+
+        // Execute the query
+        const [rows] = await db.query(query, [userId]);
+
+        // Log the result for debugging purposes
+        console.log(`Query result: ${JSON.stringify(rows)}`);
+
+        // Check if no data was returned
+        if (!Array.isArray(rows) || rows.length === 0) {
+            return res.status(404).send({
+                success: false,
+                message: "No owner data found for the given user ID"
+            });
+        }
+
+        // Return the result
+        res.status(200).send({
+            success: true,
+            message: "Users ID retrieved successfully",
+            data: rows
+        });
+
+    } catch (e) {
+        // Log the error and send a response
+        console.error('Error executing query:', e);
+        res.status(500).send({
+            success: false,
+            message: "Error retrieving Users ID",
+            error: e.message
+        });
+    }
+};
+
+
 
 const Resever = async (req, res) => {
     const {
@@ -256,4 +348,4 @@ const Resever = async (req, res) => {
   };
 
   //
-module.exports = { GetOwnerID , GetJobByUserId , GetQueueByDate , Resever , GetDateStatus , CloseJob , UpdateDateStatus };
+module.exports = {  GetUserID , GetOwnerID , GetJobByUserId , GetQueueByDate , Resever , GetDateStatus , CloseJob , UpdateDateStatus , GetDateStatus_ID};
