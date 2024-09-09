@@ -30,6 +30,8 @@ const GetuserAll = async (req, res) => {
     }
 };
 
+
+
 const GetUserById = async (req, res) => {
     const user_id = req.params.user_id;
 
@@ -117,18 +119,6 @@ const register_users = async (req, res) => {
         res.status(500).json({ status: 'error', message: 'Internal Server Error' });
     }
 };
-
-    // res.status(201).send({
-    //     success: true,
-    //     message: "User registered successfully",
-    //     data: {
-    //         users_id: result.insertId,
-    //         users_username,
-    //         users_phone, 
-    //         users_image,
-    //         users_address
-    //     }
-    // });
 
 //LoginUsers
 const LoginUsers = async (req, res) => {
