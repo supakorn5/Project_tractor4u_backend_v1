@@ -335,4 +335,76 @@ const GetOrderByDate = async (req, res) => {
     }
 };
 
-module.exports = { GetuserAll, register_users, LoginUsers,GetUserById , updateProfile, Reserve, GetDateStatus, GetOrderByDate};
+const updateUserAddress = async (req, res) => {
+    const {
+        users_address,
+        user_id
+    } = req.body; // Corrected to req.body
+  
+    const query = `UPDATE final_project.users SET users_address = ? WHERE (users_id = ?)`;
+    
+    try {
+      const [result] = await db.query(query, [users_address,user_id]);
+      
+      res.status(200).send({
+        status: 'OK',
+        message: 'Update Success'
+      });
+    } catch (error) {
+      res.status(500).send({
+        status: 'Error',
+        message: 'An error occurred while updating the Users Address',
+        error: error.message
+      });
+    }
+  };
+
+  const updateTellnumber = async (req, res) => {
+    const {
+        users_Tell,
+        user_id
+    } = req.body; // Corrected to req.body
+  
+    const query = `UPDATE final_project.users SET users_phone = ? WHERE users_id = ?`;
+    
+    try {
+      const [result] = await db.query(query, [users_Tell,user_id]);
+      
+      res.status(200).send({
+        status: 'OK',
+        message: 'Update Success'
+      });
+    } catch (error) {
+      res.status(500).send({
+        status: 'Error',
+        message: 'An error occurred while updating the Users TellNumber',
+        error: error.message
+      });
+    }
+  };
+
+  const updateProfilePic = async (req, res) => {
+    const {
+        users_image,
+        user_id
+    } = req.body; // Corrected to req.body
+  
+    const query = `UPDATE final_project.users SET users_image = ? WHERE users_id = ?`;
+    
+    try {
+      const [result] = await db.query(query, [users_image,user_id]);
+      
+      res.status(200).send({
+        status: 'OK',
+        message: 'Update Success'
+      });
+    } catch (error) {
+      res.status(500).send({
+        status: 'Error',
+        message: 'An error occurred while updating the Users Picture',
+        error: error.message
+      });
+    }
+  };
+
+module.exports = { GetuserAll, register_users, LoginUsers,GetUserById , updateProfile, Reserve, GetDateStatus, GetOrderByDate,updateUserAddress,updateTellnumber,updateProfilePic};
