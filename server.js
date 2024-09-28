@@ -6,6 +6,7 @@ const ownersRoute = require('./router/owners/ownersRouter')
 const landsRoute = require('./router/lands/landsRouter')
 const ordersRouter = require('./router/orders/odersRoute');
 
+
 app.use(express.json());
 
 app.use('/api/users', usersRoute);

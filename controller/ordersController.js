@@ -151,9 +151,9 @@ const GetDateStatus = async(req, res) => {
     }
 
     try {
-        const query = `SELECT dateStatus_id, dateStatus_status, DATE_FORMAT(dateStatus_date, '%Y-%m-%d') as date
-                        FROM final_project.datestatus
-                        WHERE dateStatus_owners_id = ?;`;
+        const query = `SELECT ownerCalendar_id, ownerCalendar_status, DATE_FORMAT(ownerCalendar_date, '%Y-%m-%d') as date
+                        FROM final_project.ownerCalendar
+                        WHERE ownerCalendar_owners_id = ?;`;
         const [rows] = await db.query(query, [Owner_id]);
         console.log(`Query result: ${JSON.stringify(rows)}`);
 
@@ -195,11 +195,11 @@ const GetDateStatus_ID = async(req, res) => {
     const userId = req.params.userId;
 
     try {
-        const query = `select dateStatus_id,DATE_FORMAT(dateStatus_date,'%Y-%m-%d') as date
+        const query = `select ownerCalendar_id,DATE_FORMAT(ownerCalendar_date,'%Y-%m-%d') as date
                         FROM final_project.owners
-                        INNER JOIN final_project.datestatus On  owners_id = dateStatus_owners_id
-                        where dateStatus_date = ?
-                        and dateStatus_owners_id = ?`;
+                        INNER JOIN final_project.ownerCalendar On  owners_id = ownerCalendar_owners_id
+                        where ownerCalendar_date = ?
+                        and ownerCalendar_owners_id = ?`;
                         const [rows] = await db.query(query, [date, userId]);
 
                         console.log(`Query result: ${JSON.stringify(rows)}`);
@@ -302,9 +302,9 @@ const Resever = async (req, res) => {
         datestatus
     } = req.body; // Corrected to req.body
   
-    const query = `UPDATE final_project.datestatus
-                    set final_project.datestatus.dateStatus_status = ?
-                    WHERE final_project.datestatus.dateStatus_id = ?;`;
+    const query = `UPDATE final_project.ownerCalendar
+                    set final_project.ownerCalendar.ownerCalendar_status = ?
+                    WHERE final_project.ownerCalendar.ownerCalendar_id = ?;`;
     
     try {
       const [result] = await db.query(query, [datestatus,dateStatus_id]);
@@ -327,9 +327,9 @@ const Resever = async (req, res) => {
         dateStatus_id,
     } = req.body; // Corrected to req.body
   
-    const query = `UPDATE final_project.datestatus
-                set final_project.datestatus.dateStatus_status = ?
-                    WHERE final_project.datestatus.dateStatus_id = ?`;
+    const query = `UPDATE final_project.ownerCalendar
+                set final_project.ownerCalendar.ownerCalendar_status = ?
+                    WHERE final_project.ownerCalendar.ownerCalendar_id = ?`;
     
     try {
       const [result] = await db.query(query, [dateStatus_id]);
