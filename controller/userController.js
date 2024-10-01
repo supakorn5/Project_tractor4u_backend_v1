@@ -150,7 +150,6 @@ const LoginUsers = async (req, res) => {
 
     const user = rows[0];
     const isPasswordValid = await bcrypt.compare(users_password, user.users_password);
-
     if (!isPasswordValid) {
         return res.status(401).send({
             status: 'FAIL',
@@ -229,7 +228,7 @@ const Reserve = async (req, res) => {
     //select date for check
     const query_select =  `select * 
                     from final_project.ownerCalendar 
-                    where ownerCalendar_owners_id = ?
+                    where ownerCalendar_owner_id = ?
                     and    ownerCalendar_date = ?`
     const [rows_select] = await db.query(query_select, [orders_owners_id, orders_start_date]);
 
@@ -237,7 +236,7 @@ const Reserve = async (req, res) => {
     if (rows_select.length == 0) {
         const query_insert =  `
             insert into final_project.ownerCalendar
-            (ownerCalendar_status, ownerCalendar_owners_id, ownerCalendar_date) values (?, ?, ?)`
+            (ownerCalendar_status, ownerCalendar_owner_id, ownerCalendar_date) values (?, ?, ?)`
         const [rows_insert] = await db.query(query_insert, [1 ,orders_owners_id, orders_start_date]);
 
         return res.json({
@@ -262,12 +261,12 @@ const GetDateStatus = async (req, res) => {
     const {
         owners_id
     } = req.body;
-
+    
     try {
         const query = `
-            SELECT ownerCalendar_id, ownerCalendar_status, ownerCalendar_owners_id, DATE_FORMAT(ownerCalendar_date, '%Y-%m-%d') AS ownerCalendar_date
+            SELECT ownerCalendar_id, ownerCalendar_status, ownerCalendar_owner_id, DATE_FORMAT(ownerCalendar_date, '%Y-%m-%d') AS ownerCalendar_date
             FROM final_project.ownerCalendar
-            where ownerCalendar_owners_id = ?
+            where ownerCalendar_owner_id = ?
         `;
         const [rows] = await db.query(query, [owners_id]);
 
