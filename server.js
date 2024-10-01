@@ -7,7 +7,7 @@ const landsRoute = require('./router/lands/landsRouter')
 const ordersRouter = require('./router/orders/odersRoute');
 
 
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 
 app.use('/api/users', usersRoute);
 app.use('/api/owners', ownersRoute);
