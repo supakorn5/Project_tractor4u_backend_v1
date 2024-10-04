@@ -48,7 +48,7 @@ const GetOwnerID = async (req, res) => {
 };
 
 const GetJobByUserId = async (req, res) => {
-    const userId = req.params.userId; 
+    const userId = req.params.userId;
     try {
         const query = `
             SELECT users_username,DATE_FORMAT(orders_start_date, '%Y-%m-%d') as date
@@ -141,7 +141,7 @@ const GetQueueByDate = async (req, res) => {
     }
 };
 
-const GetDateStatus = async(req, res) => {
+const GetDateStatus = async (req, res) => {
     const Owner_id = req.params.Owner_id;
     if (!Owner_id) {
         return res.status(400).send({
@@ -179,7 +179,7 @@ const GetDateStatus = async(req, res) => {
     }
 }
 
-const GetDateStatus_ID = async(req, res) => {
+const GetDateStatus_ID = async (req, res) => {
     const dateParam = req.params.date;
     const date = moment(dateParam, 'YYYY-MM-DD').format('YYYY-MM-DD');
 
@@ -200,31 +200,31 @@ const GetDateStatus_ID = async(req, res) => {
                         INNER JOIN final_project.ownerCalendar On  owners_id = ownerCalendar_owners_id
                         where ownerCalendar_date = ?
                         and ownerCalendar_owners_id = ?`;
-                        const [rows] = await db.query(query, [date, userId]);
+        const [rows] = await db.query(query, [date, userId]);
 
-                        console.log(`Query result: ${JSON.stringify(rows)}`);
-                
-                        if (!Array.isArray(rows) || rows.length === 0) {
-                            return res.status(404).send({
-                                success: false,
-                                message: "No data found"
-                            });
-                        }
-                
-                        res.status(200).send({
-                            success: true,
-                            message: "All Queue By Date",
-                            data: rows
-                        });
-                
-                    } catch (e) {
-                        console.error(e);
-                        res.status(500).send({
-                            success: false,
-                            message: "Error getting queue",
-                            error: e.message
-                        });
-                    }
+        console.log(`Query result: ${JSON.stringify(rows)}`);
+
+        if (!Array.isArray(rows) || rows.length === 0) {
+            return res.status(404).send({
+                success: false,
+                message: "No data found"
+            });
+        }
+
+        res.status(200).send({
+            success: true,
+            message: "All Queue By Date",
+            data: rows
+        });
+
+    } catch (e) {
+        console.error(e);
+        res.status(500).send({
+            success: false,
+            message: "Error getting queue",
+            error: e.message
+        });
+    }
 }
 
 const GetUserID = async (req, res) => {
@@ -277,75 +277,124 @@ const Resever = async (req, res) => {
         orders_id,
         orders_status
     } = req.body; // Corrected to req.body
-  
-    const query = 'update final_project.orders set orders_status = ? where orders_id = ?';
-    
-    try {
-      const [result] = await db.query(query, [orders_status , orders_id]);
-      
-      res.status(200).send({
-        status: 'OK',
-        message: 'Update Success'
-      });
-    } catch (error) {
-      res.status(500).send({
-        status: 'Error',
-        message: 'An error occurred while updating the Orders',
-        error: error.message
-      });
-    }
-  };
 
-  const UpdateDateStatus = async (req, res) => {
+    const query = 'update final_project.orders set orders_status = ? where orders_id = ?';
+
+    try {
+        const [result] = await db.query(query, [orders_status, orders_id]);
+
+        res.status(200).send({
+            status: 'OK',
+            message: 'Update Success'
+        });
+    } catch (error) {
+        res.status(500).send({
+            status: 'Error',
+            message: 'An error occurred while updating the Orders',
+            error: error.message
+        });
+    }
+};
+
+const UpdateDateStatus = async (req, res) => {
     const {
         dateStatus_id,
         datestatus
     } = req.body; // Corrected to req.body
-  
+
     const query = `UPDATE final_project.ownerCalendar
                     set final_project.ownerCalendar.ownerCalendar_status = ?
                     WHERE final_project.ownerCalendar.ownerCalendar_id = ?;`;
-    
-    try {
-      const [result] = await db.query(query, [datestatus,dateStatus_id]);
-      
-      res.status(200).send({
-        status: 'OK',
-        message: 'Update Success'
-      });
-    } catch (error) {
-      res.status(500).send({
-        status: 'Error',
-        message: 'An error occurred while updating the Orders',
-        error: error.message
-      });
-    }
-  };
 
-  const CloseJob = async (req, res) => {
+    try {
+        const [result] = await db.query(query, [datestatus, dateStatus_id]);
+
+        res.status(200).send({
+            status: 'OK',
+            message: 'Update Success'
+        });
+    } catch (error) {
+        res.status(500).send({
+            status: 'Error',
+            message: 'An error occurred while updating the Orders',
+            error: error.message
+        });
+    }
+};
+
+const CloseJob = async (req, res) => {
     const {
         dateStatus_id,
     } = req.body; // Corrected to req.body
-  
+
     const query = `UPDATE final_project.ownerCalendar
                 set final_project.ownerCalendar.ownerCalendar_status = ?
                     WHERE final_project.ownerCalendar.ownerCalendar_id = ?`;
-    
-    try {
-      const [result] = await db.query(query, [dateStatus_id]);
-      
-      res.status(200).send({
-        status: 'OK',
-        message: 'Update Success'
-      });
-    } catch (error) {
-      res.status(500).send({
-        status: 'Error',
-        message: 'An error occurred while updating the Orders',
-        error: error.message
-      });
-    }
-  };
 
-  //
-module.exports = {  GetUserID , GetOwnerID , GetJobByUserId , GetQueueByDate , Resever , GetDateStatus , CloseJob , UpdateDateStatus , GetDateStatus_ID};
+    try {
+        const [result] = await db.query(query, [dateStatus_id]);
+
+        res.status(200).send({
+            status: 'OK',
+            message: 'Update Success'
+        });
+    } catch (error) {
+        res.status(500).send({
+            status: 'Error',
+            message: 'An error occurred while updating the Orders',
+            error: error.message
+        });
+    }
+};
+
+
+//
+const orderByID = async (req, res) => {
+    const { orders_id } = req.body;
+
+    // Input validation
+    if (!orders_id) {
+        return res.status(400).send({
+            success: false,
+            message: "orders_id is required"
+        });
+    }
+
+    const query = `SELECT * FROM final_project.orders WHERE orders_id = ?`;
+
+    try {
+        // Execute the query
+        const [rows] = await db.query(query, [orders_id]);
+
+        // Check if no order was found
+        if (!Array.isArray(rows) || rows.length === 0) {
+            return res.status(404).send({
+                success: false,
+                message: "No Order found for this orders_id"
+            });
+        }
+
+        // Return the result
+        res.status(200).send({
+            success: true,
+            message: "Order retrieved successfully",
+            data: rows
+        });
+
+    } catch (error) {
+        // Handle any unexpected errors
+        console.error(error);
+        res.status(500).send({
+            success: false,
+            message: "An error occurred while fetching the order",
+            error: error.message
+        });
+    }
+};
+
+
+
+
+
+    //
+    module.exports = { GetUserID, GetOwnerID, GetJobByUserId, GetQueueByDate, Resever, GetDateStatus, CloseJob, UpdateDateStatus, GetDateStatus_ID };
