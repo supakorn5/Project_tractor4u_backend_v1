@@ -10,6 +10,9 @@ const {CloseJob} = require('../../controller/ordersController');
 const {UpdateDateStatus} = require('../../controller/ordersController');
 const {GetDateStatus_ID} = require('../../controller/ordersController');
 const {GetUserID} = require('../../controller/ordersController');
+const {GetOrderByUsersID} = require('../../controller/ordersController');
+const {getOrdersUserStatus} = require('../../controller/ordersController');
+
 
 router.get('/GetJobByUserId/:userId', GetJobByUserId);
 router.get('/GetQueueByDate/:date/:userId', GetQueueByDate);
@@ -22,5 +25,7 @@ router.get('/GetUserID/:userId',GetUserID);
 router.post('/Resever',Resever);
 router.post('/CloseJob',CloseJob);
 router.put('/UpdateDateStatus',UpdateDateStatus);
+router.post('/GetOrderByUsersID',GetOrderByUsersID)
+router.post('/getOrdersUserStatus',getOrdersUserStatus)
 
 module.exports = router;
